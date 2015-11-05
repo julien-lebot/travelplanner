@@ -73,48 +73,55 @@ namespace TravelPlanner.Data
             set;
         }
 
+        private static void AddUser(Data.TravelPlannerDbContext context, string userName, string password, string roleId)
+        {
+            IdentityUser user = new IdentityUser(userName)
+            {
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+            user.Roles.Add(new IdentityUserRole { RoleId = roleId, UserId = user.Id });
+
+#if FALSE
+            user.Claims.Add(new IdentityUserClaim
+            {
+                UserId = user.Id,
+                ClaimType = "hasRegistered",
+                ClaimValue = "true"
+            });
+#endif
+
+            user.PasswordHash = new PasswordHasher().HashPassword(password);
+            context.Users.Add(user);
+            try
+            {
+                context.SaveChanges();
+            }
+            catch (DbEntityValidationException ex)
+            {
+                throw;
+            }
+        }
+
+        public static void Seed(TravelPlannerDbContext context)
+        {
+            IdentityRole userRole = context.Roles.Add(new IdentityRole("User"));
+            IdentityRole userManagerRole = context.Roles.Add(new IdentityRole("UserManager"));
+            IdentityRole adminRole = context.Roles.Add(new IdentityRole("Admin"));
+
+            AddUser(context, "TestUser1", "test", userRole.Id);
+            AddUser(context, "TestUserManager1", "test", userManagerRole.Id);
+            AddUser(context, "TestAdmin1", "test", adminRole.Id);
+        }
+
         private class Initializer : CreateDatabaseIfNotExists<TravelPlannerDbContext>
         {
-            private void AddUser(TravelPlannerDbContext context, string userName, string password, string roleId)
-            {
-                IdentityUser user = new IdentityUser(userName)
-                {
-                    SecurityStamp = Guid.NewGuid().ToString()
-                };
-                user.Roles.Add(new IdentityUserRole { RoleId = roleId, UserId = user.Id});
-                user.Claims.Add(new IdentityUserClaim
-                {
-                    UserId = user.Id,
-                    ClaimType = "hasRegistered",
-                    ClaimValue = "true"
-                });
-
-                user.PasswordHash = new PasswordHasher().HashPassword(password);
-                context.Users.Add(user);
-                try
-                {
-                    context.SaveChanges();
-                }
-                catch (DbEntityValidationException ex)
-                {
-                    
-                    throw;
-                }
-                
-            }
-
             protected override void Seed(TravelPlannerDbContext context)
             {
-                IdentityRole userRole = context.Roles.Add(new IdentityRole("User"));
-                IdentityRole userManagerRole = context.Roles.Add(new IdentityRole("UserManager"));
-                IdentityRole adminRole = context.Roles.Add(new IdentityRole("Admin"));
-
-                AddUser(context, "TestUser1", "test", userRole.Id);
-                AddUser(context, "TestUserManager1", "test", userManagerRole.Id);
-                AddUser(context, "TestAdmin1", "test", adminRole.Id);
-
+                TravelPlannerDbContext.Seed(context);
                 base.Seed(context);
             }
         }
     }
+
+
 }
