@@ -204,7 +204,7 @@ namespace TravelPlanner.Controllers
         /// <returns>All the trips.</returns>
         [EnableQuery]
         [Route("api/Trips/All")]
-        [AuthorizedRoles("Admin")]
+        [AuthorizedRoles(Roles.Admin)]
         public IQueryable<TripWithId> GetAll()
         {
             var ctx = new TravelPlannerDbContext();
@@ -259,7 +259,7 @@ namespace TravelPlanner.Controllers
             var ctx = new TravelPlannerDbContext();
 
             Data.Trip trip = null;
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole(Roles.Admin))
             {
                 trip = ctx.Trips.FirstOrDefault(t => t.Id == id);
             }
@@ -312,7 +312,7 @@ namespace TravelPlanner.Controllers
             var ctx = new TravelPlannerDbContext();
             Data.Trip trip = null;
 
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole(Roles.Admin))
             {
                 trip = ctx.Trips.FirstOrDefault(t => t.Id == id);
             }

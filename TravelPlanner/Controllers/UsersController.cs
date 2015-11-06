@@ -13,6 +13,13 @@ using TravelPlanner.Filters;
 
 namespace TravelPlanner.Controllers
 {
+    public static class Roles
+    {
+        public const string User = "User";
+        public const string UserManager = "UserManager";
+        public const string Admin = "Admin";
+    }
+
     public class AuthorizedRolesAttribute : AuthorizeAttribute
     {
         public AuthorizedRolesAttribute(params string[] roles)
@@ -65,7 +72,7 @@ namespace TravelPlanner.Controllers
     public class UsersController : ApiController
     {
         [EnableQuery]
-        [AuthorizedRoles("UserManager, Admin")]
+        [AuthorizedRoles(Roles.UserManager, Roles.Admin)]
         public IQueryable<Dto.UserWithId> Get()
         {
             var ctx = new TravelPlannerDbContext();
@@ -99,6 +106,7 @@ namespace TravelPlanner.Controllers
                 });
         }
 
+        [AllowAnonymous]
         public async Task<IHttpActionResult> Post(Dto.CreateUser user)
         {
             if (!ModelState.IsValid)
@@ -109,11 +117,30 @@ namespace TravelPlanner.Controllers
             var ctx = new TravelPlannerDbContext();
             var userMgr = CreateUserManager(ctx);
             var roleMgr = CreateRoleManager(ctx);
+
+            // Force user role for new users
+            // Also ensures there is always a role
+            if (User.Identity == null || user.Roles == null || user.Roles.Count == 0)
+            {
+                user.Roles = new List<string> { Roles.User };
+            }
+            else
+            {
+                // UserManager and User can only create users
+                var userId = User.Identity.GetUserId();
+                if (await userMgr.IsInRoleAsync(userId, Roles.User) ||
+                    await userMgr.IsInRoleAsync(userId, Roles.UserManager))
+                {
+                    user.Roles.RemoveAll(r => r != Roles.User);
+                }
+            }
+
             var nonExistentRoles = user.Roles.Where(role => !roleMgr.RoleExists(role));
             if (nonExistentRoles.Any())
             {
                 return BadRequest(string.Format("Roles {0} do not exist", string.Join(", ", nonExistentRoles)));
             }
+
             var idUser = new IdentityUser { UserName = user.UserName };
             var result = await userMgr.CreateAsync(idUser, user.Password);
             if (result.Succeeded)
@@ -132,9 +159,27 @@ namespace TravelPlanner.Controllers
             return BadRequest(string.Join(", ", result.Errors));
         }
 
+        [AuthorizedRoles(Roles.UserManager, Roles.Admin)]
         public async Task<IHttpActionResult> Delete(string id)
         {
+            var ctx = new TravelPlannerDbContext();
+            var userMgr = CreateUserManager(ctx);
+            var roleMgr = CreateRoleManager(ctx);
 
+            var user = await userMgr.FindByIdAsync(id);
+            if (user != null)
+            {
+                var result = await userMgr.DeleteAsync(user);
+                if (!result.Succeeded)
+                {
+                    return BadRequest(string.Join(", ", result.Errors));
+                }
+            }
+            else
+            {
+                return NotFound();
+            }
+            return Ok();
         }
 
         private static UserManager<IdentityUser> CreateUserManager()
