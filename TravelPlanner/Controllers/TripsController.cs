@@ -1,183 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Filters;
+using System.Web.Http.Description;
 using System.Web.Http.Results;
 using System.Web.OData;
-using FluentValidation;
 using Microsoft.AspNet.Identity;
-using TravelPlanner.Controllers.Dto;
 using TravelPlanner.Data;
 using TravelPlanner.Filters;
+using TravelPlanner.Filters.BasicAuthentication;
+using TravelPlanner.Infrastructure;
+using TravelPlanner.Models;
+using Trip = TravelPlanner.Models.Trip;
 
 namespace TravelPlanner.Controllers
 {
-    public class ValidateModelStateAttribute : ActionFilterAttribute
-    {
-        public override void OnActionExecuting(HttpActionContext actionContext)
-        {
-            if (!actionContext.ModelState.IsValid)
-            {
-                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, actionContext.ModelState);
-            }
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Method, Inherited = true)]
-    public class CheckModelForNullAttribute : ActionFilterAttribute
-    {
-        private readonly Func<Dictionary<string, object>, bool> _validate;
-
-        public CheckModelForNullAttribute()
-            : this(arguments => arguments.ContainsValue(null))
-        { }
-
-        public CheckModelForNullAttribute(Func<Dictionary<string, object>, bool> checkCondition)
-        {
-            _validate = checkCondition;
-        }
-
-        public override void OnActionExecuting(HttpActionContext actionContext)
-        {
-            if (_validate(actionContext.ActionArguments))
-            {
-                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "The argument cannot be null");
-            }
-        }
-    }
-
-    namespace Dto
-    {
-        public class TripValidator : AbstractValidator<Trip>
-        {
-            public TripValidator()
-            {
-                RuleFor(x => x.StartDate).NotNull().LessThan(x => x.EndDate);
-                RuleFor(x => x.EndDate).NotNull()/*.GreaterThan(x => x.StartDate)*/;
-                RuleFor(x => x.Destination).NotNull();
-                RuleFor(x => x.Comment).NotNull();
-            }
-        }
-
-        [FluentValidation.Attributes.Validator(typeof(TripValidator))]
-        public class Trip
-        {
-            public DateTimeOffset StartDate
-            {
-                get;
-                set;
-            }
-
-            public DateTimeOffset EndDate
-            {
-                get;
-                set;
-            }
-
-            public string Destination
-            {
-                get;
-                set;
-            }
-
-            public string Comment
-            {
-                get;
-                set;
-            }
-        }
-
-        public class PatchTrip
-        {
-            private readonly Data.Trip _entity;
-
-            public PatchTrip(Data.Trip entity)
-            {
-                _entity = entity;
-            }
-
-            public PatchTrip()
-            {
-                _entity = new Data.Trip();
-            }
-
-            public string StartDate
-            {
-                get
-                {
-                    return _entity.StartDate.ToString();
-                }
-                set
-                {
-                    _entity.StartDate = DateTimeOffset.Parse(value);
-                }
-            }
-
-            public string EndDate
-            {
-                get
-                {
-                    return _entity.EndDate.ToString();
-                }
-                set
-                {
-                    _entity.EndDate = DateTimeOffset.Parse(value);
-                }
-            }
-
-            public string Destination
-            {
-                get
-                {
-                    return _entity.Destination;
-                }
-                set
-                {
-                    _entity.Destination = value;
-                }
-            }
-
-            public string Comment
-            {
-                get
-                {
-                    return _entity.Comment;
-                }
-                set
-                {
-                    _entity.Comment = value;
-                }
-            }
-        }
-
-        public class TripWithId : Trip
-        {
-            public string Id
-            {
-                get;
-                set;
-            }
-
-        }
-    }
-
     /// <summary>
     /// Controller to CRUD trips.
     /// Any user can access this.
     /// </summary>
     [Authorize]
-    [IdentityBasicAuthentication]
+    //[IdentityBasicAuthentication]
     public class TripsController : ApiController
     {
+        private readonly ITripManager _tripManager;
+
+        public TripsController(ITripManager tripManager)
+        {
+            _tripManager = tripManager;
+        }
+
         /// <summary>
         /// Retrieves all the trips for the current user.
         /// </summary>
@@ -185,9 +41,8 @@ namespace TravelPlanner.Controllers
         [EnableQuery]
         public IQueryable<TripWithId> Get()
         {
-            var ctx = new TravelPlannerDbContext();
             var userId = User.Identity.GetUserId();
-            return ctx.Trips.Where(t => t.UserId == userId).Select(t => new TripWithId
+            return _tripManager.GetTripsByUserId(userId).AsQueryable().Select(t => new TripWithId
             {
                 Id = t.Id,
                 StartDate = t.StartDate,
@@ -207,8 +62,7 @@ namespace TravelPlanner.Controllers
         [AuthorizedRoles(Roles.Admin)]
         public IQueryable<TripWithId> GetAll()
         {
-            var ctx = new TravelPlannerDbContext();
-            return ctx.Trips.Select(t => new TripWithId
+            return _tripManager.Trips.Select(t => new TripWithId
             {
                 Id = t.Id,
                 StartDate = t.StartDate,
@@ -223,12 +77,9 @@ namespace TravelPlanner.Controllers
         /// </summary>
         /// <param name="trip">The trip to create.</param>
         /// <returns>The result of the operation: Ok (200) or BadRequest (400).</returns>
-        public async Task<IHttpActionResult> Post(Dto.Trip trip)
+        [ResponseType(typeof(TripWithId))]
+        public async Task<IHttpActionResult> Post(Trip trip)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
             var tripEntity = new Data.Trip
             {
                 UserId = User.Identity.GetUserId(),
@@ -237,9 +88,7 @@ namespace TravelPlanner.Controllers
                 EndDate = trip.EndDate,
                 StartDate = trip.StartDate,
             };
-            var ctx = new TravelPlannerDbContext();
-            ctx.Trips.Add(tripEntity);
-            await ctx.SaveChangesAsync();
+            await _tripManager.CreateTrip(tripEntity);
             return Created(new Uri(string.Format("/trips/{0}", tripEntity.Id), UriKind.Relative), new TripWithId
             {
                 Id = tripEntity.Id,
@@ -250,46 +99,18 @@ namespace TravelPlanner.Controllers
             });
         }
 
+        [ResponseType(typeof(TripWithId))]
         public async Task<IHttpActionResult> Patch(string id, Delta<PatchTrip> userTrip)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var ctx = new TravelPlannerDbContext();
-
-            Data.Trip trip = null;
-            if (User.IsInRole(Roles.Admin))
-            {
-                trip = ctx.Trips.FirstOrDefault(t => t.Id == id);
-            }
-            else
-            {
-                var userId = User.Identity.GetUserId();
-                trip = ctx.Trips.FirstOrDefault(t => t.Id == id && t.UserId == userId);
-            }
-
+            var trip = GetTripForRole(id);
             if (trip == null)
             {
                 return NotFound();
             }
             var patchTrip = new PatchTrip(trip);
             userTrip.Patch(patchTrip);
-            try
-            {
-                await ctx.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ctx.Trips.Any(t => t.Id == id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _tripManager.UpdateTrip(trip);
+
             return Ok(new TripWithId
             {
                 Id = trip.Id,
@@ -298,6 +119,16 @@ namespace TravelPlanner.Controllers
                 Destination = trip.Destination,
                 Comment = trip.Comment
             });
+        }
+
+        private Data.Trip GetTripForRole(string tripId)
+        {
+            if (User.IsInRole(Roles.Admin))
+            {
+                return _tripManager.GetTripById(tripId);
+            }
+            var userId = User.Identity.GetUserId();
+            return _tripManager.GetTripByIdForUser(tripId, userId);
         }
 
         /// <summary>
@@ -309,39 +140,12 @@ namespace TravelPlanner.Controllers
         /// <returns>The result of the request: Ok (200) or NotFound (404)</returns>
         public async Task<IHttpActionResult> Delete(string id)
         {
-            var ctx = new TravelPlannerDbContext();
-            Data.Trip trip = null;
-
-            if (User.IsInRole(Roles.Admin))
-            {
-                trip = ctx.Trips.FirstOrDefault(t => t.Id == id);
-            }
-            else
-            {
-                var userId = User.Identity.GetUserId();
-                trip = ctx.Trips.FirstOrDefault(t => t.Id == id && t.UserId == userId);
-            }
-
+            var trip = GetTripForRole(id);
             if (trip == null)
             {
                 return NotFound();
             }
-            ctx.Trips.Remove(trip);
-            try
-            {
-                await ctx.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ctx.Trips.Any(t => t.Id == id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _tripManager.DeleteTrip(trip);
             return Ok();
         }
     }

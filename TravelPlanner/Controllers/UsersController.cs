@@ -10,79 +10,36 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using TravelPlanner.Data;
 using TravelPlanner.Filters;
+using TravelPlanner.Filters.BasicAuthentication;
+using TravelPlanner.Models;
 
 namespace TravelPlanner.Controllers
 {
-    public static class Roles
-    {
-        public const string User = "User";
-        public const string UserManager = "UserManager";
-        public const string Admin = "Admin";
-    }
-
-    public class AuthorizedRolesAttribute : AuthorizeAttribute
-    {
-        public AuthorizedRolesAttribute(params string[] roles)
-        {
-            Roles = String.Join(",", roles);
-        }
-    }
-
-    namespace Dto
-    {
-        public class User
-        {
-            public string UserName
-            {
-                get;
-                set;
-            }
-
-            public List<string> Roles
-            {
-                get;
-                set;
-            }
-        }
-
-        public class CreateUser : User
-        {
-            public string Password
-            {
-                get;
-                set;
-            }
-        }
-
-        public class UserWithId : User
-        {
-            public string Id
-            {
-                get;
-                set;
-            }
-        }
-    }
-
     /// <summary>
     /// Controller to CRUD users.
     /// </summary>
     [Authorize]
-    [IdentityBasicAuthentication]
+    //[IdentityBasicAuthentication]
     public class UsersController : ApiController
     {
+        private readonly UserManager<IdentityUser> _usrMgr;
+        private readonly RoleManager<IdentityRole> _roleMgr;
+
+        public UsersController(UserManager<IdentityUser> usrMgr, RoleManager<IdentityRole> roleMgr)
+        {
+            _usrMgr = usrMgr;
+            _roleMgr = roleMgr;
+        }
+
         [EnableQuery]
         [AuthorizedRoles(Roles.UserManager, Roles.Admin)]
-        public IQueryable<Dto.UserWithId> Get()
+        public IQueryable<UserWithId> Get()
         {
-            var ctx = new TravelPlannerDbContext();
-            var userMgr = CreateUserManager(ctx);
-            var roleMgr = CreateRoleManager(ctx);
-            return userMgr.Users.Select(u => new Dto.UserWithId
+            return _usrMgr.Users.Select(u => new UserWithId
                 {
                     Id = u.Id,
                     UserName = u.UserName,
-                    Roles = (from role in roleMgr.Roles
+                    Roles = (from role in _roleMgr.Roles
                              join userRole in u.Roles on role.Id equals userRole.RoleId
                              select role.Name).ToList()
                 });
@@ -92,35 +49,36 @@ namespace TravelPlanner.Controllers
         public async Task<IHttpActionResult> GetCurrentUser()
         {
             var userId = User.Identity.GetUserId();
-            var userMgr = CreateUserManager();
-            var idUser = await userMgr.FindByIdAsync(userId);
+            var idUser = await _usrMgr.FindByIdAsync(userId);
             if (idUser == null)
             {
                 return NotFound();
             }
-            return Ok(new Dto.UserWithId
+            return Ok(new UserWithId
                 {
                     Id = idUser.Id,
                     UserName = idUser.UserName,
-                    Roles = userMgr.GetRoles(userId).ToList()
+                    Roles = _usrMgr.GetRoles(userId).ToList()
                 });
         }
 
         [AllowAnonymous]
-        public async Task<IHttpActionResult> Post(Dto.CreateUser user)
+        public async Task<IHttpActionResult> Post(CreateUser user)
         {
-            if (!ModelState.IsValid)
+            var nonExistentRoles = user.Roles.Where(role => !_roleMgr.RoleExists(role)).ToList();
+            if (nonExistentRoles.Any())
             {
-                return BadRequest(ModelState);
+#if DEBUG
+                return BadRequest(string.Format("Roles {0} do not exist", string.Join(", ", nonExistentRoles)));
+#else
+                // In production environment, don't reveal roles
+                return BadRequest();
+#endif
             }
-
-            var ctx = new TravelPlannerDbContext();
-            var userMgr = CreateUserManager(ctx);
-            var roleMgr = CreateRoleManager(ctx);
 
             // Force user role for new users
             // Also ensures there is always a role
-            if (User.Identity == null || user.Roles == null || user.Roles.Count == 0)
+            if (!User.Identity.IsAuthenticated || user.Roles == null || user.Roles.Count == 0)
             {
                 user.Roles = new List<string> { Roles.User };
             }
@@ -128,31 +86,25 @@ namespace TravelPlanner.Controllers
             {
                 // UserManager and User can only create users
                 var userId = User.Identity.GetUserId();
-                if (await userMgr.IsInRoleAsync(userId, Roles.User) ||
-                    await userMgr.IsInRoleAsync(userId, Roles.UserManager))
+                if (await _usrMgr.IsInRoleAsync(userId, Roles.User) ||
+                    await _usrMgr.IsInRoleAsync(userId, Roles.UserManager))
                 {
                     user.Roles.RemoveAll(r => r != Roles.User);
                 }
             }
 
-            var nonExistentRoles = user.Roles.Where(role => !roleMgr.RoleExists(role));
-            if (nonExistentRoles.Any())
-            {
-                return BadRequest(string.Format("Roles {0} do not exist", string.Join(", ", nonExistentRoles)));
-            }
-
             var idUser = new IdentityUser { UserName = user.UserName };
-            var result = await userMgr.CreateAsync(idUser, user.Password);
+            var result = await _usrMgr.CreateAsync(idUser, user.Password);
             if (result.Succeeded)
             {
-                result = await userMgr.AddToRolesAsync(idUser.Id, user.Roles.ToArray());
+                result = await _usrMgr.AddToRolesAsync(idUser.Id, user.Roles.ToArray());
                 if (result.Succeeded)
                 {
-                    return Created(new Uri(string.Format("/api/users/{0}", idUser.Id), UriKind.Relative), new Dto.UserWithId
+                    return Created(new Uri(string.Format("/api/users/{0}", idUser.Id), UriKind.Relative), new UserWithId
                     {
                         Id = idUser.Id,
                         UserName = idUser.UserName,
-                        Roles = userMgr.GetRoles(idUser.Id).ToList()
+                        Roles = _usrMgr.GetRoles(idUser.Id).ToList()
                     });
                 }
             }
@@ -162,14 +114,10 @@ namespace TravelPlanner.Controllers
         [AuthorizedRoles(Roles.UserManager, Roles.Admin)]
         public async Task<IHttpActionResult> Delete(string id)
         {
-            var ctx = new TravelPlannerDbContext();
-            var userMgr = CreateUserManager(ctx);
-            var roleMgr = CreateRoleManager(ctx);
-
-            var user = await userMgr.FindByIdAsync(id);
+            var user = await _usrMgr.FindByIdAsync(id);
             if (user != null)
             {
-                var result = await userMgr.DeleteAsync(user);
+                var result = await _usrMgr.DeleteAsync(user);
                 if (!result.Succeeded)
                 {
                     return BadRequest(string.Join(", ", result.Errors));
@@ -180,26 +128,6 @@ namespace TravelPlanner.Controllers
                 return NotFound();
             }
             return Ok();
-        }
-
-        private static UserManager<IdentityUser> CreateUserManager()
-        {
-            return CreateUserManager(new TravelPlannerDbContext());
-        }
-
-        private static UserManager<IdentityUser> CreateUserManager(TravelPlannerDbContext context)
-        {
-            return new UserManager<IdentityUser>(new UserStore<IdentityUser>(context));
-        }
-
-        private static RoleManager<IdentityRole> CreateRoleManager()
-        {
-            return CreateRoleManager(new TravelPlannerDbContext());
-        }
-
-        private static RoleManager<IdentityRole> CreateRoleManager(TravelPlannerDbContext context)
-        {
-            return new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
         }
     }
 }

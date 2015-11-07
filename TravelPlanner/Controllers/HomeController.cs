@@ -14,5 +14,11 @@ namespace TravelPlanner.Controllers
 
             return View();
         }
+
+        [Route("Partials/{name}")]
+        public ActionResult Partial(string name)
+        {
+            return PartialView(name);
+        }
     }
 }

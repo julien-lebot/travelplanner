@@ -1,0 +1,26 @@
+﻿@{
+    Layout = null;
+}
+
+<div class="mdl-grid">
+    <div ng-repeat="trip in tripsData.trips" class="card-trip mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title mdl-card--expand">
+            <h4>
+                {{trip.destination}}:<br>
+                {{trip.startDate}} - {{trip.endDate}}<br>
+                {{trip.comment}}<br/>
+                {{trip.relative}}
+            </h4>
+        </div>
+        <div class="mdl-card__actions mdl-card--border">
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                Edit
+            </a>
+            <div class="mdl-layout-spacer"></div>
+            <i class="material-icons">event</i>
+        </div>
+    </div>
+</div>
+<button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="add-new" ng-click="addNewTrip()">
+    <i class="material-icons">add</i>
+</button>

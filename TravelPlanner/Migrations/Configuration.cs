@@ -16,7 +16,7 @@ namespace TravelPlanner.Migrations
 
         protected override void Seed(Data.TravelPlannerDbContext context)
         {
-            TravelPlannerDbContext.Seed(context);
+            TravelPlannerDbContext.DoSeed(context);
         }
     }
 }

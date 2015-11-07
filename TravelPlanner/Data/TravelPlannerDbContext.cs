@@ -73,7 +73,7 @@ namespace TravelPlanner.Data
             set;
         }
 
-        private static void AddUser(Data.TravelPlannerDbContext context, string userName, string password, string roleId)
+        private static void AddUser(TravelPlannerDbContext context, string userName, string password, string roleId)
         {
             IdentityUser user = new IdentityUser(userName)
             {
@@ -102,7 +102,7 @@ namespace TravelPlanner.Data
             }
         }
 
-        public static void Seed(TravelPlannerDbContext context)
+        public static void DoSeed(TravelPlannerDbContext context)
         {
             IdentityRole userRole = context.Roles.Add(new IdentityRole("User"));
             IdentityRole userManagerRole = context.Roles.Add(new IdentityRole("UserManager"));
@@ -117,7 +117,7 @@ namespace TravelPlanner.Data
         {
             protected override void Seed(TravelPlannerDbContext context)
             {
-                TravelPlannerDbContext.Seed(context);
+                DoSeed(context);
                 base.Seed(context);
             }
         }

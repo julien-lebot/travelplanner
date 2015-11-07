@@ -1,0 +1,26 @@
+﻿@{
+    Layout = null;
+}
+
+<div class="mdl-grid">
+    <div class="mdl-layout-spacer"></div>
+    <form ng-submit="login()">
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-field">
+            <input class="mdl-textfield__input" type="text" id="login-username" ng-model="loginData.userName">
+            <label class="mdl-textfield__label" for="login-username">Username</label>
+            <span class="mdl-textfield__error">{{usernameErrors}}</span>
+        </div>
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-field">
+            <input class="mdl-textfield__input" type="password" id="login-password" ng-model="loginData.password">
+            <label class="mdl-textfield__label" for="login-password">Password</label>
+            <span class="mdl-textfield__error">{{passwordErrors}}</span>
+        </div>
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" href="#/register">
+            Register
+        </a>
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+            Login
+        </button>
+    </form>
+    <div class="mdl-layout-spacer"></div>
+</div>
