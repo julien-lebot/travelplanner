@@ -1,4 +1,6 @@
 ﻿/// <reference path="../app.ts" />
+'use strict';
+
 declare var showDialog: any;
 declare var componentHandler: any;
 

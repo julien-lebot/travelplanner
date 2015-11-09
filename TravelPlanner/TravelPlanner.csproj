@@ -204,7 +204,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="public\js\app\directives\" />
+    <Folder Include="Content\js\app\directives\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -239,6 +239,8 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Data\ApplicationUser.cs" />
+    <Compile Include="Data\Trip.cs" />
     <Compile Include="Filters\CheckModelForNullAttribute.cs" />
     <Compile Include="Filters\OAuth\ApplicationOAuthProvider.cs" />
     <Compile Include="Infrastructure\DbFactory.cs" />
@@ -252,6 +254,11 @@
     <Compile Include="Infrastructure\TripManager.cs" />
     <Compile Include="Infrastructure\TripRepository.cs" />
     <Compile Include="Infrastructure\UnitOfWork.cs" />
+    <Compile Include="Migrations\201511090255103_Initial Migration.cs" />
+    <Compile Include="Migrations\201511090255103_Initial Migration.Designer.cs">
+      <DependentUpon>201511090255103_Initial Migration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CreateUserValidator.cs" />
     <Compile Include="Models\PatchTrip.cs" />
     <Compile Include="Models\Trip.cs" />
     <Compile Include="Models\TripValidator.cs" />
@@ -272,10 +279,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201511051020372_Initial Migration.cs" />
-    <Compile Include="Migrations\201511051020372_Initial Migration.Designer.cs">
-      <DependentUpon>201511051020372_Initial Migration.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Results\AddChallengeOnUnauthorizedResult.cs" />
@@ -284,6 +287,20 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\lib\angular-route\angular-route.js" />
+    <Content Include="Content\lib\angular-route\angular-route.min.js" />
+    <Content Include="Content\lib\angularjs\angular.js" />
+    <Content Include="Content\lib\angularjs\angular.min.js" />
+    <Content Include="Content\lib\jquery\jquery-2.1.4.js" />
+    <Content Include="Content\lib\jquery\jquery-2.1.4.min.js" />
+    <Content Include="Content\lib\mdl-jquery-modal-dialog\mdl-jquery-modal-dialog.css" />
+    <Content Include="Content\lib\mdl-jquery-modal-dialog\mdl-jquery-modal-dialog.js" />
+    <Content Include="Content\lib\mdldesignlite\material.css" />
+    <Content Include="Content\lib\mdldesignlite\material.js" />
+    <Content Include="Content\lib\mdldesignlite\material.min.css" />
+    <Content Include="Content\lib\mdldesignlite\material.min.js" />
+    <Content Include="Content\lib\momentjs\moment-with-locales.js" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Areas\HelpPage\Views\Web.config" />
@@ -313,85 +330,64 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Areas\HelpPage\Views\_ViewStart.cshtml" />
-    <Content Include="Content\Site.css" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="public\css\Site.css">
-      <DependentUpon>Site.scss</DependentUpon>
-    </Content>
-    <Content Include="public\css\Site.min.css">
-      <DependentUpon>Site.css</DependentUpon>
-    </Content>
-    <Content Include="public\fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="public\lib\angular-route\angular-route.js" />
-    <Content Include="public\lib\angularjs\angular.js" />
-    <Content Include="public\lib\jquery\jquery-2.1.4.js" />
-    <Content Include="public\lib\mdl-jquery-modal-dialog\mdl-jquery-modal-dialog.css" />
-    <Content Include="public\lib\mdl-jquery-modal-dialog\mdl-jquery-modal-dialog.js" />
-    <Content Include="public\lib\mdldesignlite\material.css" />
-    <Content Include="public\lib\mdldesignlite\material.js" />
-    <Content Include="public\lib\mdldesignlite\material.min.css" />
-    <Content Include="public\lib\mdldesignlite\material.min.js" />
-    <Content Include="public\lib\momentjs\moment-with-locales.js" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Content\css\Site.scss" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\lib\mdl-jquery-modal-dialog\LICENSE" />
+    <Content Include="Content\lib\mdl-jquery-modal-dialog\README.md" />
+    <Content Include="Content\lib\mdldesignlite\bower.json" />
+    <Content Include="Content\lib\mdldesignlite\LICENSE" />
+    <Content Include="Content\lib\mdldesignlite\material.min.css.map" />
+    <Content Include="Content\lib\mdldesignlite\material.min.js.map" />
+    <Content Include="Content\lib\mdldesignlite\package.json" />
     <None Include="Project_Readme.html" />
-    <Content Include="public\fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="public\fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="public\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="public\css\Site.scss" />
-    <Content Include="public\css\Site.css.map">
-      <DependentUpon>Site.css</DependentUpon>
-    </Content>
     <Content Include="Views\Home\Home.cshtml" />
     <Content Include="Views\Home\Login.cshtml" />
     <Content Include="Views\Home\Register.cshtml" />
     <Content Include="Views\Home\Users.cshtml" />
     <Content Include="Views\Home\Trip.cshtml" />
     <None Include="Properties\PublishProfiles\mytripplanner.pubxml" />
-    <Content Include="public\lib\mdl-jquery-modal-dialog\LICENSE" />
-    <Content Include="public\lib\mdl-jquery-modal-dialog\README.md" />
-    <Content Include="public\lib\mdldesignlite\bower.json" />
-    <Content Include="public\lib\mdldesignlite\LICENSE" />
-    <Content Include="public\lib\mdldesignlite\material.min.css.map" />
-    <Content Include="public\lib\mdldesignlite\material.min.js.map" />
-    <Content Include="public\lib\mdldesignlite\package.json" />
     <Content Include="Views\Home\User.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201511051020372_Initial Migration.resx">
-      <DependentUpon>201511051020372_Initial Migration.cs</DependentUpon>
-    </EmbeddedResource>
+    <TypeScriptCompile Include="Content\js\app\app.ts" />
+    <TypeScriptCompile Include="Content\js\app\controllers\homeController.ts" />
+    <TypeScriptCompile Include="Content\js\app\controllers\indexController.ts" />
+    <TypeScriptCompile Include="Content\js\app\controllers\loginController.ts" />
+    <TypeScriptCompile Include="Content\js\app\controllers\registerController.ts" />
+    <TypeScriptCompile Include="Content\js\app\controllers\tripController.ts" />
+    <TypeScriptCompile Include="Content\js\app\controllers\userController.ts" />
+    <TypeScriptCompile Include="Content\js\app\controllers\usersController.ts" />
+    <TypeScriptCompile Include="Content\js\app\filters\Filters.ts" />
+    <TypeScriptCompile Include="Content\js\app\services\AuthInterceptorService.ts" />
+    <TypeScriptCompile Include="Content\js\app\services\AuthService.ts" />
+    <TypeScriptCompile Include="Content\js\app\services\PageService.ts" />
+    <TypeScriptCompile Include="Content\js\app\services\TripsService.ts" />
+    <TypeScriptCompile Include="Content\js\app\services\UsersService.ts" />
+    <TypeScriptCompile Include="Content\typings\angularjs\angular-animate.d.ts" />
+    <TypeScriptCompile Include="Content\typings\angularjs\angular-cookies.d.ts" />
+    <TypeScriptCompile Include="Content\typings\angularjs\angular-mocks.d.ts" />
+    <TypeScriptCompile Include="Content\typings\angularjs\angular-resource.d.ts" />
+    <TypeScriptCompile Include="Content\typings\angularjs\angular-route.d.ts" />
+    <TypeScriptCompile Include="Content\typings\angularjs\angular-sanitize.d.ts" />
+    <TypeScriptCompile Include="Content\typings\angularjs\angular.d.ts" />
+    <TypeScriptCompile Include="Content\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="Content\typings\moment\moment-node.d.ts" />
+    <TypeScriptCompile Include="Content\typings\moment\moment.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="public\js\app\controllers\homeController.ts" />
-    <TypeScriptCompile Include="public\js\app\controllers\userController.ts" />
-    <TypeScriptCompile Include="public\js\app\controllers\tripController.ts" />
-    <TypeScriptCompile Include="public\js\app\filters\Filters.ts" />
-    <TypeScriptCompile Include="public\js\app\services\UsersService.ts" />
-    <TypeScriptCompile Include="public\typings\moment\moment-node.d.ts" />
-    <TypeScriptCompile Include="public\typings\moment\moment.d.ts" />
-    <TypeScriptCompile Include="public\js\app\app.ts" />
-    <TypeScriptCompile Include="public\js\app\controllers\indexController.ts" />
-    <TypeScriptCompile Include="public\js\app\controllers\usersController.ts" />
-    <TypeScriptCompile Include="public\js\app\controllers\loginController.ts" />
-    <TypeScriptCompile Include="public\js\app\controllers\registerController.ts" />
-    <TypeScriptCompile Include="public\js\app\services\AuthInterceptorService.ts" />
-    <TypeScriptCompile Include="public\js\app\services\TripsService.ts" />
-    <TypeScriptCompile Include="public\js\app\services\PageService.ts" />
-    <TypeScriptCompile Include="public\js\app\services\AuthService.ts" />
-    <TypeScriptCompile Include="public\typings\angularjs\angular-animate.d.ts" />
-    <TypeScriptCompile Include="public\typings\angularjs\angular-cookies.d.ts" />
-    <TypeScriptCompile Include="public\typings\angularjs\angular-mocks.d.ts" />
-    <TypeScriptCompile Include="public\typings\angularjs\angular-resource.d.ts" />
-    <TypeScriptCompile Include="public\typings\angularjs\angular-route.d.ts" />
-    <TypeScriptCompile Include="public\typings\angularjs\angular-sanitize.d.ts" />
-    <TypeScriptCompile Include="public\typings\angularjs\angular.d.ts" />
-    <TypeScriptCompile Include="public\typings\jquery\jquery.d.ts" />
+    <EmbeddedResource Include="Migrations\201511090255103_Initial Migration.resx">
+      <DependentUpon>201511090255103_Initial Migration.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

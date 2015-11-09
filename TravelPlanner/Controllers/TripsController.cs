@@ -109,6 +109,21 @@ namespace TravelPlanner.Controllers
             }
             var patchTrip = new PatchTrip(trip);
             userTrip.Patch(patchTrip);
+
+            // Have to do manual validation here
+            if (trip.StartDate > trip.EndDate)
+            {
+                ModelState.AddModelError("startDate", "Start date cannot be greater than end date");
+            }
+            if (string.IsNullOrEmpty(trip.Destination))
+            {
+                ModelState.AddModelError("destination", "Destination cannot be null or empty");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             await _tripManager.UpdateTrip(trip);
 
             return Ok(new TripWithId

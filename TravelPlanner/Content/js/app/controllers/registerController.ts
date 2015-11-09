@@ -1,4 +1,5 @@
 ﻿/// <reference path="../app.ts" />
+'use strict';
 
 module app.controllers {
 
@@ -26,8 +27,7 @@ module app.controllers {
                 }, 2000);
             }
 
-            $scope.signUp = () =>
-            {
+            $scope.signUp = () => {
                 $scope.errors = "";
                 $scope.usernameErrors = "";
                 $scope.passwordErrors = "";
@@ -46,12 +46,10 @@ module app.controllers {
                             if (key.indexOf('UserName') > -1) {
                                 $scope.usernameErrors = errorStr;
                             }
-                            else if (key.indexOf('Password') > -1)
-                            {
+                            else if (key.indexOf('Password') > -1) {
                                 $scope.passwordErrors = errorStr;
                             }
-                            else
-                            {
+                            else {
                                 $scope.errors = errorStr;
                             }
                         }

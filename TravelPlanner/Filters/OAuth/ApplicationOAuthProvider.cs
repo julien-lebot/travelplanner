@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
+using TravelPlanner.Data;
 
 namespace TravelPlanner.Filters.OAuth
 {
@@ -26,7 +27,7 @@ namespace TravelPlanner.Filters.OAuth
 
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
-            var userManager = context.OwinContext.GetAutofacLifetimeScope().Resolve<UserManager<IdentityUser>>();
+            var userManager = context.OwinContext.GetAutofacLifetimeScope().Resolve<UserManager<ApplicationUser>>();
 
             var user = await userManager.FindAsync(context.UserName, context.Password);
 

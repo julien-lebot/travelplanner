@@ -1,4 +1,5 @@
 ﻿/// <reference path="../app.ts" />
+'use strict';
 
 module app.controllers {
     export class LoginController implements IController {

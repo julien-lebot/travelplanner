@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace TravelPlanner.Models
 {

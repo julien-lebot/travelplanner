@@ -56,7 +56,8 @@ angular.module('app').config([
             });
     }
 ]).
-    run(($rootScope, $location, $timeout, authService: app.services.AuthService) => {
+    run(['$rootScope', '$location', '$timeout', 'authService',
+        ($rootScope, $location, $timeout, authService: app.services.AuthService) => {
         $rootScope.$on("$routeChangeStart", (event, next, current) => {
             if (!authService.authentication.isAuth) {
                 // no logged user, redirect to /login
@@ -72,7 +73,7 @@ angular.module('app').config([
                 componentHandler.upgradeAllRegistered();
             });
         });
-    });
+    }]);
 
 module app {
 

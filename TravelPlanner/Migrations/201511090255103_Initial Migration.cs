@@ -39,10 +39,10 @@ namespace TravelPlanner.Migrations
                         EndDate = c.DateTimeOffset(nullable: false, precision: 7),
                         Destination = c.String(),
                         Comment = c.String(),
-                        UserId = c.String(maxLength: 128),
+                        UserId = c.String(nullable: false, maxLength: 128),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.AspNetUsers", t => t.UserId)
+                .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
                 .Index(t => t.UserId);
             
             CreateTable(

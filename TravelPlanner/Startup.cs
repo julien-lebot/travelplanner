@@ -17,6 +17,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
 using Owin;
+using TravelPlanner.Data;
 using TravelPlanner.Filters;
 using TravelPlanner.Filters.OAuth;
 using TravelPlanner.Infrastructure;
@@ -47,6 +48,7 @@ namespace TravelPlanner
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             var builder = new ContainerBuilder();
@@ -75,10 +77,10 @@ namespace TravelPlanner
                 c =>
                 {
                     var usrMgr =
-                        new UserManager<IdentityUser>(new UserStore<IdentityUser>(c.Resolve<IDbFactory>().Init()));
+                        new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(c.Resolve<IDbFactory>().Init()));
 
                     // Configure validation logic for usernames
-                    usrMgr.UserValidator = new UserValidator<IdentityUser>(usrMgr)
+                    usrMgr.UserValidator = new UserValidator<ApplicationUser>(usrMgr)
                     {
                         AllowOnlyAlphanumericUserNames = false,
                         RequireUniqueEmail = true

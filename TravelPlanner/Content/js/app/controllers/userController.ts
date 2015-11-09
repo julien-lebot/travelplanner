@@ -12,7 +12,7 @@ module app.controllers {
             userName: "",
             password: "",
             roles: [
-                { name: 'User', selected: false },
+                { name: 'User', selected: true },
                 { name: 'UserManager', selected: false },
                 { name: 'Admin', selected: false }
             ]
@@ -28,8 +28,7 @@ module app.controllers {
         error = {
             genErrors: "",
             userNameErrors: "",
-            passwordErrors: "",
-            roleErrors: ""
+            passwordErrors: ""
         }
 
         constructor(
@@ -68,14 +67,35 @@ module app.controllers {
         }
 
         setErrors = (err) => {
-            for (var key in err.modelState) {
-                var errors = [];
-                for (var i = 0; i < err.modelState[key].length; i++) {
-                    errors.push(err.modelState[key][i]);
-                }
-                var errorStr = errors.join(' ');
-                if (errorStr.length > 0) {
-                    this.error.genErrors = errorStr;
+            if (err.modelState === undefined)
+            {
+                this.error.genErrors = err.message;
+            }
+            else
+            {
+                for (var key in err.modelState)
+                {
+                    var errors = [];
+                    for (var i = 0; i < err.modelState[key].length; i++)
+                    {
+                        errors.push(err.modelState[key][i]);
+                    }
+                    var errorStr = errors.join(' ');
+                    if (errorStr.length > 0)
+                    {
+                        if (key.indexOf('UserName') > -1)
+                        {
+                            this.error.userNameErrors = errorStr;
+                        }
+                        else if (key.indexOf('Password') > -1)
+                        {
+                            this.error.passwordErrors = errorStr;
+                        }
+                        else
+                        {
+                            this.error.genErrors = errorStr;
+                        }
+                    }
                 }
             }
         };
@@ -104,13 +124,10 @@ module app.controllers {
             }
         }
 
-        save = () =>
-        {
+        save = () => {
             var roles = [];
-            for (var i = 0; i < this.userData.roles.length; ++i)
-            {
-                if (this.userData.roles[i].selected)
-                {
+            for (var i = 0; i < this.userData.roles.length; ++i) {
+                if (this.userData.roles[i].selected) {
                     roles.push(this.userData.roles[i].name);
                 }
             }

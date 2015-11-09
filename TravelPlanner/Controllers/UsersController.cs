@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -22,10 +24,10 @@ namespace TravelPlanner.Controllers
     [IdentityBasicAuthentication]
     public class UsersController : ApiController
     {
-        private readonly UserManager<IdentityUser> _usrMgr;
+        private readonly UserManager<ApplicationUser> _usrMgr;
         private readonly RoleManager<IdentityRole> _roleMgr;
 
-        public UsersController(UserManager<IdentityUser> usrMgr, RoleManager<IdentityRole> roleMgr)
+        public UsersController(UserManager<ApplicationUser> usrMgr, RoleManager<IdentityRole> roleMgr)
         {
             _usrMgr = usrMgr;
             _roleMgr = roleMgr;
@@ -35,7 +37,9 @@ namespace TravelPlanner.Controllers
         [AuthorizedRoles(Roles.UserManager, Roles.Admin)]
         public IQueryable<UserWithId> Get()
         {
-            return _usrMgr.Users.Select(u => new UserWithId
+            var userId = User.Identity.GetUserId();
+            // Return all users, except current
+            return _usrMgr.Users.Where(u => u.Id != userId).Select(u => new UserWithId
                 {
                     Id = u.Id,
                     UserName = u.UserName,
@@ -96,7 +100,7 @@ namespace TravelPlanner.Controllers
                 }
             }
 
-            var idUser = new IdentityUser { UserName = user.UserName, Email = user.UserName + "@travel.com" };
+            var idUser = new ApplicationUser { UserName = user.UserName, Email = user.UserName + "@travel.com" };
             var result = await _usrMgr.CreateAsync(idUser, user.Password);
             if (result.Succeeded)
             {
@@ -126,6 +130,102 @@ namespace TravelPlanner.Controllers
                     ModelState.AddModelError("user", err);
                 }
             }
+            return BadRequest(ModelState);
+        }
+
+        public async Task<IHttpActionResult> Patch(string id, PatchUser patchUser)
+        {
+            var userId = User.Identity.GetUserId();
+            var roles = await _usrMgr.GetRolesAsync(userId);
+
+            if (!(roles.Contains(Roles.UserManager) ||
+                  roles.Contains(Roles.UserManager)))
+            {
+                // User can only update themselves
+                if (userId != id)
+                {
+                    ModelState.AddModelError("userId", "Permission denied");
+                }
+
+                // Users cannot change their roles
+                if (patchUser.Roles != null)
+                {
+                    patchUser.Roles = new List<string>
+                    {
+                        "User"
+                    };
+                }
+            }
+
+            var targetRoles = await _usrMgr.GetRolesAsync(id);
+            if (roles.Contains(Roles.UserManager))
+            {
+                // User manager cannot change admin
+                // User manager cannot upgrade anybody to admin
+                if (targetRoles.Contains(Roles.Admin) ||
+                    patchUser.Roles != null && patchUser.Roles.Contains(Roles.Admin))
+                {
+                    ModelState.AddModelError("userId", "Permission denied");
+                }
+            }
+
+            IdentityResult result = null;
+            if (ModelState.IsValid)
+            {
+                var usr = await _usrMgr.FindByIdAsync(id);
+
+                if (!string.IsNullOrEmpty(patchUser.Password))
+                {
+                    result = await _usrMgr.RemovePasswordAsync(id);
+                    if (result.Succeeded)
+                    {
+                        result = await _usrMgr.AddPasswordAsync(id, patchUser.Password);
+                    }
+                }
+                if (result == null || result.Succeeded)
+                {
+                    if (patchUser.Roles != null)
+                    {
+                        var currRoles = await _usrMgr.GetRolesAsync(id);
+                        result = await _usrMgr.RemoveFromRolesAsync(id, currRoles.ToArray());
+                        if (result.Succeeded)
+                        {
+                            result = await _usrMgr.AddToRolesAsync(id, patchUser.Roles.ToArray());
+                        }
+                    }
+                }
+
+                if (result == null || result.Succeeded)
+                {
+                    return Ok(
+                        new UserWithId
+                        {
+                            Id = id,
+                            UserName = usr.UserName,
+                            Roles = _usrMgr.GetRoles(id).ToList()
+                        });
+                }
+            }
+
+            if (result != null)
+            {
+                foreach (var err in result.Errors)
+                {
+                    if (err.IndexOf("password", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        ModelState.AddModelError("user.Password", err);
+                    }
+                    else if (err.IndexOf("username", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        ModelState.AddModelError("user.UserName", err);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("user", err);
+                    }
+                }
+            }
+
             return BadRequest(ModelState);
         }
 

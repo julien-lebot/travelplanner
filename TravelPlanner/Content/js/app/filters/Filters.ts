@@ -1,5 +1,4 @@
 ﻿/// <reference path="../app.ts" />
-
 'use strict';
 
 module app.filters {
