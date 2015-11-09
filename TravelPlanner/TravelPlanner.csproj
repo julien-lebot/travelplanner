@@ -287,6 +287,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
+    <Content Include="Content\css\Site.css">
+      <DependentUpon>Site.scss</DependentUpon>
+    </Content>
+    <Content Include="Content\css\Site.css.map">
+      <DependentUpon>Site.css</DependentUpon>
+    </Content>
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\lib\angular-route\angular-route.js" />
     <Content Include="Content\lib\angular-route\angular-route.min.js" />

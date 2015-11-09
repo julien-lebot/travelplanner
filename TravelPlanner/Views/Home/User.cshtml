@@ -11,21 +11,24 @@
         </div>
         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-field">
 
-            <input class="mdl-textfield__input" type="password" id="password" ng-model="userData.password" />
+            <input class="mdl-textfield__input" type="password" id="password" ng-model="userData.password"/>
             <label class="mdl-textfield__label" for="password">Password</label>
             <span class="error-msg">{{error.passwordErrors}}</span>
 
         </div>
-        <span>User role:</span>
-        <label for="{{role.name}}" class="mdl-checkbox mdl-js-checkbox" ng-repeat="role in userData.roles">
-            <input type="checkbox" id="{{role.name}}" class="mdl-checkbox__input" ng-model="role.selected">
-            <span class="mdl-checkbox__label">{{role.name}}</span>
-        </label>
+
+        <div ng-hide="!isAdmin">
+            <span>User role:</span>
+            <label for="{{role.name}}" class="mdl-checkbox mdl-js-checkbox" ng-repeat="role in userData.roles">
+                <input type="checkbox" id="{{role.name}}" class="mdl-checkbox__input" ng-model="role.selected">
+                <span class="mdl-checkbox__label">{{role.name}}</span>
+            </label>
+        </div>
 
         <div class="dialog-button-bar">
 
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect" ng-click="cancel()">Cancel</button>
-            <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" ng-click="delete()" ng-hide="!deleteEnabled">Delete</button>
+            <button class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect" ng-click="delete()" ng-hide="!deleteEnabled">Delete</button>
             <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" ng-click="save()">{{actionBtnTitle}}</button>
 
         </div>

@@ -36,7 +36,9 @@ module app.controllers {
             $location,
             $routeParams,
             pageService: app.services.PageService,
-            usersService: app.services.UsersService) {
+            usersService: app.services.UsersService,
+            authService: app.services.AuthService) {
+            $scope.isAdmin = authService.authentication.roles.indexOf('Admin') > -1;
             this.usrId = $routeParams.userId;
             $scope.deleteEnabled = this.usrId !== undefined;
             this.usersService = usersService;
@@ -67,32 +69,24 @@ module app.controllers {
         }
 
         setErrors = (err) => {
-            if (err.modelState === undefined)
-            {
+            if (err.modelState === undefined) {
                 this.error.genErrors = err.message;
             }
-            else
-            {
-                for (var key in err.modelState)
-                {
+            else {
+                for (var key in err.modelState) {
                     var errors = [];
-                    for (var i = 0; i < err.modelState[key].length; i++)
-                    {
+                    for (var i = 0; i < err.modelState[key].length; i++) {
                         errors.push(err.modelState[key][i]);
                     }
                     var errorStr = errors.join(' ');
-                    if (errorStr.length > 0)
-                    {
-                        if (key.indexOf('UserName') > -1)
-                        {
+                    if (errorStr.length > 0) {
+                        if (key.indexOf('UserName') > -1) {
                             this.error.userNameErrors = errorStr;
                         }
-                        else if (key.indexOf('Password') > -1)
-                        {
+                        else if (key.indexOf('Password') > -1) {
                             this.error.passwordErrors = errorStr;
                         }
-                        else
-                        {
+                        else {
                             this.error.genErrors = errorStr;
                         }
                     }
@@ -170,4 +164,4 @@ module app.controllers {
     };
 };
 
-app.registerController('UserController', ['$scope', '$location', '$routeParams', 'pageService', 'usersService']);
+app.registerController('UserController', ['$scope', '$location', '$routeParams', 'pageService', 'usersService', 'authService']);

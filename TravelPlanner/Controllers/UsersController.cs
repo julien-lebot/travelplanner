@@ -85,11 +85,11 @@ namespace TravelPlanner.Controllers
 
             // Force user role for new users
             // Also ensures there is always a role
-            if (!User.Identity.IsAuthenticated || user.Roles == null || user.Roles.Count == 0)
+            if (!User.Identity.IsAuthenticated)
             {
-                user.Roles = new List<string> { Roles.User };
+                user.Roles = null;
             }
-            else
+            else if (user.Roles != null)
             {
                 // UserManager and User can only create users
                 var userId = User.Identity.GetUserId();
@@ -98,6 +98,11 @@ namespace TravelPlanner.Controllers
                 {
                     user.Roles.RemoveAll(r => r != Roles.User);
                 }
+            }
+
+            if (user.Roles == null || user.Roles.Count == 0)
+            {
+                user.Roles = new List<string> { Roles.User };
             }
 
             var idUser = new ApplicationUser { UserName = user.UserName, Email = user.UserName + "@travel.com" };
@@ -139,7 +144,7 @@ namespace TravelPlanner.Controllers
             var roles = await _usrMgr.GetRolesAsync(userId);
 
             if (!(roles.Contains(Roles.UserManager) ||
-                  roles.Contains(Roles.UserManager)))
+                  roles.Contains(Roles.Admin)))
             {
                 // User can only update themselves
                 if (userId != id)

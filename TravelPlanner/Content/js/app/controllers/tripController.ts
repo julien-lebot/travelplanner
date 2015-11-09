@@ -2,7 +2,6 @@
 'use strict';
 
 declare var showDialog: any;
-declare var componentHandler: any;
 
 module app.controllers {
     export class TripController implements IController {
@@ -137,7 +136,7 @@ module app.controllers {
                 if (prev.startDate !== curr.startDate) {
                     patch.StartDate = moment(curr.startDate).format("YYYY/MM/DD");
                 }
-                if (prev.startDate !== curr.startDate) {
+                if (prev.endDate !== curr.endDate) {
                     patch.EndDate = moment(curr.endDate).format("YYYY/MM/DD");
                 }
                 this.tripsService.update(this.tripId, patch).then(

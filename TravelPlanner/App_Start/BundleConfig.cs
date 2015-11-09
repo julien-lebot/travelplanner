@@ -41,8 +41,7 @@ namespace TravelPlanner
                 "~/Content/js/app/app.js",
                 "~/Content/js/app/services/*.js",
                 "~/Content/js/app/filters/*.js",
-                "~/Content/js/app/controllers/*.js",
-                "~/Content/js/app/directives/*.js"
+                "~/Content/js/app/controllers/*.js"
                 );
 
             var appCss = new StyleBundle("~/bundles/css").Include(

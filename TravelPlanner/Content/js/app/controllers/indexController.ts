@@ -30,7 +30,7 @@ module app.controllers {
                     '   <style>html, body { font-family: "Roboto", "Helvetica", sans-serif; font-size: 14px; font- weight: 400; line - height: 20px; color: rgba(0,0,0, 0.87); font- size: 1em; line - height: 1.4; }</style>' +
                     '   <title>Print trips</title>' +
                     '</head>');
-                my_window.document.write('<body onafterprint="self.close()">');
+                my_window.document.write('<body onafterprint="self.close()"><button onclick="window.print()">Print</button>'); 
                 var trips = [];
                 if ($("#all-trips").hasClass("is-active"))
                 {
@@ -51,6 +51,14 @@ module app.controllers {
                     my_window.document.write('<p><span>Comment: </span>' + trips[i].comment + '</li></p>');
                 }
                 my_window.document.write('</ul></body></html>');
+                // Sometimes the text disappear if we try to print automatically
+                /*var script = my_window.document.createElement("script");
+                script.type = "text/javascript";
+                script.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js";
+                $(my_window).ready(() =>
+                {
+                    setTimeout(() => my_window.print(), 10);
+                });*/
             }
         }
     };
