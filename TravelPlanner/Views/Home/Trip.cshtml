@@ -1,0 +1,43 @@
+﻿<div class="mdl-grid">
+    <div class="mdl-layout-spacer"></div>
+    <form>
+        <span class="error-msg">{{error.genErrors}}</span>
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-field">
+
+            <input class="mdl-textfield__input" type="text" id="dest" ng-model="tripData.destination"/>
+            <label class="mdl-textfield__label" for="dest">Destination</label>
+            <span class="error-msg">{{error.destErrors}}</span>
+
+        </div>
+        <span>Start date</span>
+        <div class="mdl-textfield mdl-js-textfield form-field">
+
+            <input class="mdl-textfield__input" type="date" id="start" ng-model="tripData.startDate" />
+            <span class="error-msg">{{error.startErrors}}</span>
+
+        </div>
+        <span>End date</span>
+        <div class="mdl-textfield mdl-js-textfield form-field">
+
+            <input class="mdl-textfield__input" type="date" id="end" ng-model="tripData.endDate" />
+            <span class="error-msg">{{error.endErrors}}</span>
+
+        </div>
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-field">
+
+            <input class="mdl-textfield__input" type="text" id="comment" ng-model="tripData.comment" />
+            <label class="mdl-textfield__label" for="comment">Comment</label>
+            <span class="error-msg">{{error.commentErrors}}</span>
+
+        </div>
+        <div class="mdl-card__actions dialog-button-bar">
+
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect" ng-click="cancel()">Cancel</button>
+            <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" ng-click="delete()" ng-hide="!deleteEnabled">Delete</button>
+            <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" ng-click="save()">{{actionBtnTitle}}</button>
+
+        </div>
+    </form>
+
+    <div class="mdl-layout-spacer"></div>
+</div>

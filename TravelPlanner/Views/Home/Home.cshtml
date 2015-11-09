@@ -1,26 +1,54 @@
-﻿@{
-    Layout = null;
-}
-
-<div class="mdl-grid">
-    <div ng-repeat="trip in tripsData.trips" class="card-trip mdl-card mdl-shadow--2dp">
-        <div class="mdl-card__title mdl-card--expand">
-            <h4>
-                {{trip.destination}}:<br>
-                {{trip.startDate}} - {{trip.endDate}}<br>
-                {{trip.comment}}<br/>
-                {{trip.relative}}
-            </h4>
+﻿<div class="mdl-grid">
+    <div class="mdl-layout-spacer"></div>
+    <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+        <div class="mdl-tabs__tab-bar">
+            <a href="#all-trips" class="mdl-tabs__tab is-active">All</a>
+            <a href="#next-month" class="mdl-tabs__tab">Next month</a>
         </div>
-        <div class="mdl-card__actions mdl-card--border">
-            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                Edit
-            </a>
-            <div class="mdl-layout-spacer"></div>
-            <i class="material-icons">event</i>
+
+        <div class="mdl-tabs__panel trip-panel is-active" id="all-trips">
+            <div ng-repeat="trip in tripsData.trips | filter:search" class="card-trip mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title mdl-card--expand">
+                    <h4>
+                        {{trip.destination}}:<br>
+                        From {{trip.startDate.format('LL')}} to {{trip.endDate.format('LL')}}<br>
+                        {{trip.comment}}<br/>
+                        {{trip.relative}}
+                    </h4>
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="#/trip/{{trip.id}}">
+                        Edit
+                    </a>
+                    <div class="mdl-layout-spacer"></div>
+                    <i class="material-icons">event</i>
+                </div>
+            </div>
+        </div>
+
+        <div class="mdl-tabs__panel trip-panel" id="next-month">
+            <div ng-repeat="trip in tripsData.trips | filter:search | inmonth: referenceDate" class="card-trip mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title mdl-card--expand">
+                    <h4>
+                        {{trip.destination}}:<br>
+                        From {{trip.startDate.format('LL')}} to {{trip.endDate.format('LL')}}<br>
+                        {{trip.comment}}<br />
+                        {{trip.relative}}
+                    </h4>
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="#/trip/{{trip.id}}">
+                        Edit
+                    </a>
+                    <div class="mdl-layout-spacer"></div>
+                    <i class="material-icons">event</i>
+                </div>
+            </div>
         </div>
     </div>
+    <div class="mdl-layout-spacer"></div>
 </div>
 <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="add-new" ng-click="addNewTrip()">
     <i class="material-icons">add</i>
 </button>
+

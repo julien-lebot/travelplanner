@@ -31,6 +31,26 @@ angular.module('app').config([
                 templateUrl: '/Partials/Login',
                 controller: 'app.controllers.LoginController'
             })
+            .when('/trip', {
+                templateUrl: '/Partials/Trip',
+                controller: 'app.controllers.TripController'
+            })
+            .when('/trip/:tripId', {
+                templateUrl: '/Partials/Trip',
+                controller: 'app.controllers.TripController'
+            })
+            .when('/users', {
+                templateUrl: '/Partials/Users',
+                controller: 'app.controllers.UsersController'
+            })
+            .when('/users/:userId', {
+                templateUrl: '/Partials/User',
+                controller: 'app.controllers.UserController'
+            })
+            .when('/newUser', {
+                templateUrl: '/Partials/User',
+                controller: 'app.controllers.UserController'
+            })
             .otherwise({
                 redirectTo: '/'
             });
@@ -45,6 +65,7 @@ angular.module('app').config([
                     $location.path("/login");
                 }
             }
+            $rootScope.currentPath = $location.path();
         });
         $rootScope.$on('$viewContentLoaded', () => {
             $timeout(() => {

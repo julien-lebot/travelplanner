@@ -24,7 +24,7 @@ namespace TravelPlanner.Controllers
     /// Any user can access this.
     /// </summary>
     [Authorize]
-    //[IdentityBasicAuthentication]
+    [IdentityBasicAuthentication]
     public class TripsController : ApiController
     {
         private readonly ITripManager _tripManager;

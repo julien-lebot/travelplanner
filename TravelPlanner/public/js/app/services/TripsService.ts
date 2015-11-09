@@ -21,32 +21,31 @@ module app.services {
                     var trip = response.data[i];
                     var start = moment(trip.startDate);
                     this.tripData.trips.push({
+                        id: trip.id,
                         destination: trip.destination,
                         comment: trip.comment,
-                        startDate: start.format("LL"),
-                        endDate: moment(trip.endDate).format("LL"),
+                        startDate: start,
+                        endDate: moment(trip.endDate),
                         relative: start.fromNow()
                     });
                 }
             });
         }
 
-        create = (trip) => {
-
-            var deferred = this.q.defer();
-
-            this.http.post("/api/trips", trip).then(
-                response => {
-                    this.refresh();
-                    deferred.resolve(response);
-                },
-                error => {
-                    deferred.reject(error);
-                });
-
-            return deferred.promise;
+        create = (trip) =>
+        {
+            return this.http.post("/api/trips", trip);
         }
 
+        update = (id, trip) =>
+        {
+            return this.http.patch("/api/trips/" + id, trip);
+        }
+
+        delete = (id) =>
+        {
+            return this.http.delete("/api/trips/" + id);
+        }
     };
 }
 

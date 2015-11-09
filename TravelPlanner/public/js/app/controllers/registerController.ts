@@ -13,7 +13,6 @@ module app.controllers {
             pageService.pageData.title = "Register";
 
             $scope.savedSuccessfully = false;
-            $scope.message = "";
 
             $scope.registration = {
                 userName: "",
@@ -27,13 +26,16 @@ module app.controllers {
                 }, 2000);
             }
 
-            $scope.signUp = () => {
+            $scope.signUp = () =>
+            {
+                $scope.errors = "";
                 $scope.usernameErrors = "";
                 $scope.passwordErrors = "";
-                authService.register($scope.registration).then(response => {
-                    $scope.savedSuccessfully = true;
-                    startTimer();
-                },
+                authService.register($scope.registration).then(
+                    response => {
+                        $scope.savedSuccessfully = true;
+                        startTimer();
+                    },
                     response => {
                         for (var key in response.data.modelState) {
                             var errors = [];
@@ -44,8 +46,13 @@ module app.controllers {
                             if (key.indexOf('UserName') > -1) {
                                 $scope.usernameErrors = errorStr;
                             }
-                            else if (key.indexOf('Password') > -1) {
+                            else if (key.indexOf('Password') > -1)
+                            {
                                 $scope.passwordErrors = errorStr;
+                            }
+                            else
+                            {
+                                $scope.errors = errorStr;
                             }
                         }
                     });

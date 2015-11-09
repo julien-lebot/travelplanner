@@ -7,7 +7,11 @@ module app.services {
         http;
         authentication = {
             isAuth: false,
+            isAdmin: false,
+            isUserManager: false,
+            id: "",
             userName: "",
+            roles: [],
             token: ""
         };
 
@@ -29,12 +33,31 @@ module app.services {
             var deferred = this.q.defer();
 
             this.http.post('/token', data, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).success(response => {
-                sessionStorage.setItem('authorizationData', JSON.stringify({ token: response.access_token, userName: loginData.userName }));
                 this.authentication.isAuth = true;
                 this.authentication.userName = loginData.userName;
                 this.authentication.token = response.access_token;
 
-                deferred.resolve(response);
+                this.http.get('api/users/current')
+                    .success(
+                        usrRes => {
+                            this.authentication.id = usrRes.id;
+                            this.authentication.roles = usrRes.roles;
+                            this.authentication.isAdmin = usrRes.roles.find((e, i, a) => e.indexOf("Admin") > -1);
+                            this.authentication.isUserManager = usrRes.roles.find((e, i, a) => e.indexOf("UserManager") > -1);
+
+                            sessionStorage.setItem('authorizationData', JSON.stringify({
+                                token: response.access_token,
+                                userName: loginData.userName,
+                                id: usrRes.id,
+                                roles: usrRes.roles
+                        }));
+
+                            deferred.resolve(response);
+                        })
+                    .error((e, s) => {
+                        this.logout();
+                        deferred.reject(e);
+                    });
 
             }).error((err, status) => {
                 this.logout();
@@ -51,15 +74,17 @@ module app.services {
             this.authentication.userName = "";
         };
 
-        restore = () =>
-        {
+        restore = () => {
             var authData = sessionStorage.getItem('authorizationData');
-            if (authData)
-            {
+            if (authData) {
                 authData = JSON.parse(authData);
                 this.authentication.isAuth = true;
                 this.authentication.userName = authData.userName;
                 this.authentication.token = authData.token;
+                this.authentication.id = authData.id;
+                this.authentication.roles = authData.roles;
+                this.authentication.isAdmin = authData.roles.find((e, i, a) => e.indexOf("Admin") > -1);
+                this.authentication.isUserManager = authData.roles.find((e, i, a) => e.indexOf("UserManager") > -1);
             }
         };
     };

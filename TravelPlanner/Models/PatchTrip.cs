@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace TravelPlanner.Models
 {
@@ -20,11 +21,11 @@ namespace TravelPlanner.Models
         {
             get
             {
-                return _entity.StartDate.ToString();
+                return _entity.StartDate.ToString("yyyy/MM/dd");
             }
             set
             {
-                _entity.StartDate = DateTimeOffset.Parse(value);
+                _entity.StartDate = DateTimeOffset.ParseExact(value, "yyyy/MM/dd", CultureInfo.InvariantCulture);
             }
         }
 
@@ -32,11 +33,11 @@ namespace TravelPlanner.Models
         {
             get
             {
-                return _entity.EndDate.ToString();
+                return _entity.EndDate.ToString("yyyy/MM/dd");
             }
             set
             {
-                _entity.EndDate = DateTimeOffset.Parse(value);
+                _entity.EndDate = DateTimeOffset.ParseExact(value, "yyyy/MM/dd", CultureInfo.InvariantCulture);
             }
         }
 

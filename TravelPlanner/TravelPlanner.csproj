@@ -21,7 +21,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
-    <TypeScriptToolsVersion>1.5</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>1</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -204,8 +204,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="wwwroot\js\app\directives\" />
-    <Folder Include="wwwroot\lib\" />
+    <Folder Include="public\js\app\directives\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -318,29 +317,50 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="wwwroot\css\Site.css">
+    <Content Include="public\css\Site.css">
       <DependentUpon>Site.scss</DependentUpon>
     </Content>
-    <Content Include="wwwroot\css\Site.min.css">
+    <Content Include="public\css\Site.min.css">
       <DependentUpon>Site.css</DependentUpon>
     </Content>
-    <Content Include="wwwroot\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="public\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="public\lib\angular-route\angular-route.js" />
+    <Content Include="public\lib\angularjs\angular.js" />
+    <Content Include="public\lib\jquery\jquery-2.1.4.js" />
+    <Content Include="public\lib\mdl-jquery-modal-dialog\mdl-jquery-modal-dialog.css" />
+    <Content Include="public\lib\mdl-jquery-modal-dialog\mdl-jquery-modal-dialog.js" />
+    <Content Include="public\lib\mdldesignlite\material.css" />
+    <Content Include="public\lib\mdldesignlite\material.js" />
+    <Content Include="public\lib\mdldesignlite\material.min.css" />
+    <Content Include="public\lib\mdldesignlite\material.min.js" />
+    <Content Include="public\lib\momentjs\moment-with-locales.js" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
       <SubType>Designer</SubType>
     </Content>
     <None Include="Project_Readme.html" />
-    <Content Include="wwwroot\fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="wwwroot\fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="wwwroot\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="wwwroot\css\Site.scss" />
-    <Content Include="wwwroot\css\Site.css.map">
+    <Content Include="public\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="public\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="public\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="public\css\Site.scss" />
+    <Content Include="public\css\Site.css.map">
       <DependentUpon>Site.css</DependentUpon>
     </Content>
     <Content Include="Views\Home\Home.cshtml" />
     <Content Include="Views\Home\Login.cshtml" />
     <Content Include="Views\Home\Register.cshtml" />
+    <Content Include="Views\Home\Users.cshtml" />
+    <Content Include="Views\Home\Trip.cshtml" />
+    <None Include="Properties\PublishProfiles\mytripplanner.pubxml" />
+    <Content Include="public\lib\mdl-jquery-modal-dialog\LICENSE" />
+    <Content Include="public\lib\mdl-jquery-modal-dialog\README.md" />
+    <Content Include="public\lib\mdldesignlite\bower.json" />
+    <Content Include="public\lib\mdldesignlite\LICENSE" />
+    <Content Include="public\lib\mdldesignlite\material.min.css.map" />
+    <Content Include="public\lib\mdldesignlite\material.min.js.map" />
+    <Content Include="public\lib\mdldesignlite\package.json" />
+    <Content Include="Views\Home\User.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201511051020372_Initial Migration.resx">
@@ -348,25 +368,30 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="wwwroot\typings\moment\moment-node.d.ts" />
-    <TypeScriptCompile Include="wwwroot\typings\moment\moment.d.ts" />
-    <TypeScriptCompile Include="wwwroot\js\app\app.ts" />
-    <TypeScriptCompile Include="wwwroot\js\app\controllers\indexController.ts" />
-    <TypeScriptCompile Include="wwwroot\js\app\controllers\homeController.ts" />
-    <TypeScriptCompile Include="wwwroot\js\app\controllers\loginController.ts" />
-    <TypeScriptCompile Include="wwwroot\js\app\controllers\registerController.ts" />
-    <TypeScriptCompile Include="wwwroot\js\app\services\AuthInterceptorService.ts" />
-    <TypeScriptCompile Include="wwwroot\js\app\services\TripsService.ts" />
-    <TypeScriptCompile Include="wwwroot\js\app\services\PageService.ts" />
-    <TypeScriptCompile Include="wwwroot\js\app\services\AuthService.ts" />
-    <TypeScriptCompile Include="wwwroot\typings\angularjs\angular-animate.d.ts" />
-    <TypeScriptCompile Include="wwwroot\typings\angularjs\angular-cookies.d.ts" />
-    <TypeScriptCompile Include="wwwroot\typings\angularjs\angular-mocks.d.ts" />
-    <TypeScriptCompile Include="wwwroot\typings\angularjs\angular-resource.d.ts" />
-    <TypeScriptCompile Include="wwwroot\typings\angularjs\angular-route.d.ts" />
-    <TypeScriptCompile Include="wwwroot\typings\angularjs\angular-sanitize.d.ts" />
-    <TypeScriptCompile Include="wwwroot\typings\angularjs\angular.d.ts" />
-    <TypeScriptCompile Include="wwwroot\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="public\js\app\controllers\homeController.ts" />
+    <TypeScriptCompile Include="public\js\app\controllers\userController.ts" />
+    <TypeScriptCompile Include="public\js\app\controllers\tripController.ts" />
+    <TypeScriptCompile Include="public\js\app\filters\Filters.ts" />
+    <TypeScriptCompile Include="public\js\app\services\UsersService.ts" />
+    <TypeScriptCompile Include="public\typings\moment\moment-node.d.ts" />
+    <TypeScriptCompile Include="public\typings\moment\moment.d.ts" />
+    <TypeScriptCompile Include="public\js\app\app.ts" />
+    <TypeScriptCompile Include="public\js\app\controllers\indexController.ts" />
+    <TypeScriptCompile Include="public\js\app\controllers\usersController.ts" />
+    <TypeScriptCompile Include="public\js\app\controllers\loginController.ts" />
+    <TypeScriptCompile Include="public\js\app\controllers\registerController.ts" />
+    <TypeScriptCompile Include="public\js\app\services\AuthInterceptorService.ts" />
+    <TypeScriptCompile Include="public\js\app\services\TripsService.ts" />
+    <TypeScriptCompile Include="public\js\app\services\PageService.ts" />
+    <TypeScriptCompile Include="public\js\app\services\AuthService.ts" />
+    <TypeScriptCompile Include="public\typings\angularjs\angular-animate.d.ts" />
+    <TypeScriptCompile Include="public\typings\angularjs\angular-cookies.d.ts" />
+    <TypeScriptCompile Include="public\typings\angularjs\angular-mocks.d.ts" />
+    <TypeScriptCompile Include="public\typings\angularjs\angular-resource.d.ts" />
+    <TypeScriptCompile Include="public\typings\angularjs\angular-route.d.ts" />
+    <TypeScriptCompile Include="public\typings\angularjs\angular-sanitize.d.ts" />
+    <TypeScriptCompile Include="public\typings\angularjs\angular.d.ts" />
+    <TypeScriptCompile Include="public\typings\jquery\jquery.d.ts" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

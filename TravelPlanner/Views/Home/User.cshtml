@@ -1,0 +1,35 @@
+﻿<div class="mdl-grid">
+    <div class="mdl-layout-spacer"></div>
+    <form>
+        <span class="error-msg">{{error.genErrors}}</span>
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-field">
+
+            <input class="mdl-textfield__input" type="text" id="username" ng-model="userData.userName" />
+            <label class="mdl-textfield__label" for="username">User name</label>
+            <span class="error-msg">{{error.userNameErrors}}</span>
+
+        </div>
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-field">
+
+            <input class="mdl-textfield__input" type="password" id="password" ng-model="userData.password" />
+            <label class="mdl-textfield__label" for="password">Password</label>
+            <span class="error-msg">{{error.passwordErrors}}</span>
+
+        </div>
+        <span>User role:</span>
+        <label for="{{role.name}}" class="mdl-checkbox mdl-js-checkbox" ng-repeat="role in userData.roles">
+            <input type="checkbox" id="{{role.name}}" class="mdl-checkbox__input" ng-model="role.selected">
+            <span class="mdl-checkbox__label">{{role.name}}</span>
+        </label>
+
+        <div class="dialog-button-bar">
+
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect" ng-click="cancel()">Cancel</button>
+            <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" ng-click="delete()" ng-hide="!deleteEnabled">Delete</button>
+            <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" ng-click="save()">{{actionBtnTitle}}</button>
+
+        </div>
+    </form>
+
+    <div class="mdl-layout-spacer"></div>
+</div>

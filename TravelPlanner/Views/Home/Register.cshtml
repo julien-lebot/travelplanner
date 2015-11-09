@@ -1,20 +1,16 @@
-﻿@{
-    Layout = null;
-}
-
-<div class="mdl-grid">
+﻿<div class="mdl-grid">
     <div class="mdl-layout-spacer"></div>
     <form ng-submit="signUp()">
-        
+        <span class="error-msg">{{errors}}</span>
         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-field">
             <input class="mdl-textfield__input" type="text" id="register-username" ng-model="registration.userName">
             <label class="mdl-textfield__label" for="register-username">Username</label>
-            <span class="mdl-textfield__error">{{usernameErrors}}</span>
+            <span class="error-msg">{{usernameErrors}}</span>
         </div>
         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-field">
             <input class="mdl-textfield__input" type="password" id="register-password" ng-model="registration.password">
             <label class="mdl-textfield__label" for="register-password">Password</label>
-            <span class="mdl-textfield__error">{{passwordErrors}}</span>
+            <span class="error-msg">{{passwordErrors}}</span>
         </div>
         <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" href="#/login">
             Login

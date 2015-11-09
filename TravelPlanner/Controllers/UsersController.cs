@@ -19,7 +19,7 @@ namespace TravelPlanner.Controllers
     /// Controller to CRUD users.
     /// </summary>
     [Authorize]
-    //[IdentityBasicAuthentication]
+    [IdentityBasicAuthentication]
     public class UsersController : ApiController
     {
         private readonly UserManager<IdentityUser> _usrMgr;
@@ -65,15 +65,18 @@ namespace TravelPlanner.Controllers
         [AllowAnonymous]
         public async Task<IHttpActionResult> Post(CreateUser user)
         {
-            var nonExistentRoles = user.Roles.Where(role => !_roleMgr.RoleExists(role)).ToList();
-            if (nonExistentRoles.Any())
+            if (user.Roles != null)
             {
+                var nonExistentRoles = user.Roles.Where(role => !_roleMgr.RoleExists(role)).ToList();
+                if (nonExistentRoles.Any())
+                {
 #if DEBUG
-                return BadRequest(string.Format("Roles {0} do not exist", string.Join(", ", nonExistentRoles)));
+                    return BadRequest(string.Format("Roles {0} do not exist", string.Join(", ", nonExistentRoles)));
 #else
                 // In production environment, don't reveal roles
                 return BadRequest();
 #endif
+                }
             }
 
             // Force user role for new users
@@ -93,7 +96,7 @@ namespace TravelPlanner.Controllers
                 }
             }
 
-            var idUser = new IdentityUser { UserName = user.UserName };
+            var idUser = new IdentityUser { UserName = user.UserName, Email = user.UserName + "@travel.com" };
             var result = await _usrMgr.CreateAsync(idUser, user.Password);
             if (result.Succeeded)
             {
@@ -108,7 +111,22 @@ namespace TravelPlanner.Controllers
                     });
                 }
             }
-            return BadRequest(string.Join(", ", result.Errors));
+            foreach (var err in result.Errors)
+            {
+                if (err.IndexOf("password", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    ModelState.AddModelError("user.Password", err);
+                }
+                else if (err.IndexOf("username", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    ModelState.AddModelError("user.UserName", err);
+                }
+                else
+                {
+                    ModelState.AddModelError("user", err);
+                }
+            }
+            return BadRequest(ModelState);
         }
 
         [AuthorizedRoles(Roles.UserManager, Roles.Admin)]

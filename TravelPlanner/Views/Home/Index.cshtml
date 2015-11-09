@@ -21,7 +21,7 @@
                         <i class="material-icons">search</i>
                     </label>
                     <div class="mdl-textfield__expandable-holder">
-                        <input class="mdl-textfield__input" type="text" id="search">
+                        <input class="mdl-textfield__input" type="text" id="search" ng-model="search.$">
                         <label class="mdl-textfield__label" for="search">Enter your query...</label>
                     </div>
                 </div>
@@ -29,11 +29,13 @@
                     <i class="material-icons">more_vert</i>
                 </button>
                 <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
-                    <li class="mdl-menu__item">About</li>
+                    <li class="mdl-menu__item" ng-click="showAboutPanel()">About</li>
+                    <li class="mdl-menu__item" ng-click="printCurrentPage()" ng-hide="currentPath !== '/'">Print</li>
                 </ul>
+
             </div>
         </header>
-        <div class="drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
+        <div class="drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50" >
             <header class="drawer-header" ng-hide="!authentication.isAuth">
 
                 <!--img src="images/user.jpg" class="avatar"-->
@@ -50,10 +52,16 @@
                 </div>
             </header>
             <nav class="navigation mdl-navigation mdl-color--blue-grey-800">
-                <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
-
+                <a class="mdl-navigation__link" href="#/">
+                    <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home
+                </a>
+                <div ng-hide="!authentication.isAuth || (!authentication.isAdmin && !authentication.isUserManager)">
+                    <a class="mdl-navigation__link" href="#/users">
+                        <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">face</i>Users
+                    </a>
+                </div>
                 <div class="mdl-layout-spacer"></div>
-                <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">help_outline</i><span class="visuallyhidden">Help</span></a>
+                <!--a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">help_outline</i><span class="visuallyhidden">Help</span></a-->
             </nav>
         </div>
         <main class="mdl-layout__content mdl-color--grey-100">

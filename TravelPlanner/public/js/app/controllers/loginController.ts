@@ -7,8 +7,7 @@ module app.controllers {
             $scope,
             $location: ng.ILocationService,
             authService: app.services.AuthService,
-            pageService: app.services.PageService)
-        {
+            pageService: app.services.PageService) {
             pageService.pageData.title = "Login";
 
             $scope.logOut = () => {
@@ -21,25 +20,24 @@ module app.controllers {
                 password: ""
             };
 
-            $scope.message = "";
-
             $scope.login = () => {
-                authService.login($scope.loginData).then(response =>
-                    {
+                $scope.usernameErrors = "";
+                $scope.passwordErrors = "";
+                $scope.errors = "";
+                authService.login($scope.loginData).then(
+                    response => {
                         var returnUrl = sessionStorage.getItem("tempPath");
-                        if (returnUrl)
-                        {
+                        if (returnUrl) {
                             sessionStorage.removeItem("tempPath");
                             $location.path(returnUrl);
                         }
-                        else
-                        {
+                        else {
                             $location.path('/');
                         }
                     },
-                err => {
-                    $scope.message = err.error_description;
-                });
+                    response => {
+                        $scope.errors = response.error_description;
+                    });
             };
         }
     };
